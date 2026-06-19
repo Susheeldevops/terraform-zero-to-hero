@@ -1,0 +1,30 @@
+provider "aws" {
+  region = "us-west-1"
+}
+
+# Create IAM user
+resource "aws_iam_user" "karthik" {
+  name          = "Karthik"
+  path          = "/mnt/"
+  force_destroy = true
+
+  tags = {
+    Environment = "UAT"
+    Team        = "QA"
+  }
+}
+
+# Create console login profile (password)
+resource "aws_iam_user_login_profile" "karthik_profile" {
+  user    = aws_iam_user.karthik.name
+  pgp_key = <<EOF
+-----BEGIN PGP PUBLIC KEY BLOCK-----
+(your actual public key here)
+-----END PGP PUBLIC KEY BLOCK-----
+EOF
+}
+
+# Output the encrypted password
+output "encrypted_password" {
+  value = aws_iam_user_login_profile.karthik_profile.encrypted_password
+}
